@@ -1,0 +1,22 @@
+
+figure.figsize : 4.125, 2.55
+
+figure.constrained_layout.use : True 
+figure.dpi: 1000 
+savefig.transparent: False
+
+font.size                : 12
+legend.fontsize          : medium
+legend.title_fontsize    : large
+axes.labelsize           : medium
+axes.titlesize           : large
+xtick.labelsize          : medium
+ytick.labelsize          : medium
+
+font.family : serif
+font.serif : cmr10, DejaVu Serif 
+mathtext.fontset : cm  
+mathtext.fallback : stix  
+axes.formatter.use_mathtext : True  
+
+text.usetex : True
