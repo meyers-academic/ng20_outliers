@@ -4,6 +4,7 @@ from pathlib import Path
 import arviz as az
 from arviz.labels import MapLabeller
 import json
+import pandas as pd
 current_file_path = Path(__file__).resolve()
 auxl_path = current_file_path.parent.parent / "auxl"
 pltsyle = auxl_path / "matplotlib.mplstyle"
@@ -47,17 +48,19 @@ def make_summary(ds_psr, az_posterior, efac_params, equad_params, ecorr_params, 
     summary.to_csv(output_dir / f"{ds_psr.name}_outliers_summary.csv")
 
 
-def plot_outliers(ds_psr, samples, output_base, outlier_threshold=0.1):
-
+def plot_outliers(ds_psr, output_base, outlier_threshold=0.1):
 
     output_dir = Path(output_base) / ds_psr.name
     output_dir.mkdir(parents=True, exist_ok=True)
+    # read in numpyro from output directory given from args
+    df = pd.read_feather(output_dir / f"{ds_psr.name}-numpyro-samples.feather")
+    df_z = df.filter(like='z_i')
+    means = df_z.mean().values
 
-    means = np.mean(samples['z_i'], axis = 0)
     plt.plot(means, zorder = 1)
     plt.title(f"{ds_psr.name} Outlier probabilities")
     plt.xlabel("TOA Number")
-    plt.ylabel("$\\langle z_i \\rangle$")
+    plt.ylabel("$<z_i>$")
     plt.axhline(y=outlier_threshold, color='r', linestyle='--', label='Outlier Threshold')
     #plt.legend()
 
@@ -72,12 +75,12 @@ def plot_outliers(ds_psr, samples, output_base, outlier_threshold=0.1):
     plt.close()
 
     bad_toa_mask = means > outlier_threshold
-    plt.errorbar(ds_psr.toas / 86400, ds_psr.residuals/1e-6, yerr=ds_psr.toaerrs/1e-6,
+    plt.errorbar(ds_psr.toas / 86400, ds_psr.residuals, yerr=ds_psr.toaerrs,
                  alpha=0.1, fmt='o', label='TOAs', zorder = 1)
-    plt.scatter(ds_psr.toas[bad_toa_mask] / 86400, ds_psr.residuals[bad_toa_mask]/1e-6,
+    plt.scatter(ds_psr.toas[bad_toa_mask] / 86400, ds_psr.residuals[bad_toa_mask],
                 facecolor='none', edgecolor='r', label = 'Outliers',
                 zorder = 2)
-    plt.ylabel(f"Residuals ($\mu$s)")
+    plt.ylabel(f"Residuals (s)")
     plt.xlabel("Time (days)")
     plt.title(f"{ds_psr.name} ")
 

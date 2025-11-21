@@ -65,7 +65,7 @@ def make_numpyro_model(psrl, priordict=ds.prior.priordict_standard, num_frequenc
     jlogl = jax.jit(psrl.logL)
 
     residuals = psrl.y
-
+    
     def model(rng_key=None): # TODO: what about the rng_key??
         # wn params
         pardict = {}
@@ -395,6 +395,13 @@ def get_parser():
         help="Number of frequencies to use"
     )
 
+    parser.add_argument(
+        "--num-devices", "-nd",
+        type=int,
+        default=1,
+        help="Number of devices to use (default: 1, type 0 to use all available devices)"
+    )
+    
     parser.add_argument(
         "--spectrum-type", "-s",
         choices=["powerlaw", "freespectrum"],

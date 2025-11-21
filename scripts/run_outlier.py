@@ -52,7 +52,7 @@ def run(args):
     ng20_v1p1_path = Path(args.dataset_path)
     ng20_v1p1_pulsar_files = sorted(list(ng20_v1p1_path.glob("*_v1p1_dmx.feather")))
 
-    ndevices = len(jax.devices())
+    ndevices = args.num_devices if args.num_devices>0 else len(jax.devices())
     psrfile = [f for f in ng20_v1p1_pulsar_files if args.pulsar_name in f.name]
     print(ng20_v1p1_pulsar_files)
     print(psrfile)
@@ -136,7 +136,7 @@ def run(args):
     # now load the arviz data from saved file to make sure it's complete
     # combine all checkpointed samples into one arviz dataset
     logger.info("Loading arviz data from each checkpoint and combining by concatenation...")
-    
+
     # glob the checkpoint files
     file = Path(args.outdir) / args.pulsar_name / f"{args.pulsar_name}_outlier_analysis_arviz_data_checkpoint_*.nc"
     files = sorted(glob(str(file)))
@@ -147,7 +147,7 @@ def run(args):
 
     logger.info("Plotting outlier results...")
     # TODO: for the plot_otliers, read in the feather file instead (easy fix, see read.ipynb)
-   # pp.plot_outliers(psr, mcmc.get_samples(), outlier_threshold=args.outlier_threshold, output_base=args.outdir)
+    pp.plot_outliers(psr, outlier_threshold=args.outlier_threshold, output_base=args.outdir)
     pp.plot_wnp(psr, efac_params, equad_params, ecorr_params, az_data.posterior, output_base=args.outdir, dataset_path=args.dataset_path)
 
     logger.info("Storing summary for EFAC, EQUAD, ECORR as csv...")
